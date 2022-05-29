@@ -1,6 +1,9 @@
 const express = require("express");
+const dbCon = require('./config/db/dbConnect');
 
 const app = express();
+
+dbCon()
 
 //For Dynamic Port
 const PORT = process.env.PORT || 5000;
