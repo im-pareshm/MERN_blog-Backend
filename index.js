@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 
 const dbCon = require('./config/db/dbConnect');
 const usersRoutes = require("./routes/users/usersRoute")
-const { errorHandler } = require("./middleware/error/errorHandler");
+const { errorHandler, notFound} = require("./middleware/error/errorHandler");
 
 dotenv.config();
 
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use("/api/users", usersRoutes);
 
 //Error handler middleware
+app.use(notFound);
 app.use(errorHandler);
 
 //For Dynamic Port
