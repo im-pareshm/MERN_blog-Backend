@@ -1,12 +1,23 @@
 const express = require("express");
-const dbCon = require('./config/db/dbConnect');
 const dotenv = require('dotenv');
+
+const dbCon = require('./config/db/dbConnect');
+const usersRoutes = require("./routes/users/usersRoute")
+const { errorHandler } = require("./middleware/error/errorHandler");
 
 dotenv.config();
 
 const app = express();
 
 dbCon()
+
+//MiddleWare
+app.use(express.json());
+//User registration
+app.use("/api/users", usersRoutes);
+
+//Error handler middleware
+app.use(errorHandler);
 
 //For Dynamic Port
 const PORT = process.env.PORT || 5000;
