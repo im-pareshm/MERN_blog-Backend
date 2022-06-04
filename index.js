@@ -13,7 +13,7 @@ dbCon()
 
 //MiddleWare
 app.use(express.json());
-//User registration
+//User routes
 app.use("/api/users", usersRoutes);
 
 //Error handler middleware
