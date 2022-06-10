@@ -1,5 +1,6 @@
 const User = require("../../model/user/User")
 const expressAsyncHandler = require("express-async-handler");
+const generateToken = require("../../config/token/generateToken")
 //--------------------------------------------------------------
 //Register
 //--------------------------------------------------------------
@@ -32,7 +33,14 @@ const userLogin = expressAsyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const userFound = await User.findOne({email});
     if(userFound && (await userFound.isPasswordMatched(password))){
-        res.json(userFound);
+        res.json({
+            firstname : userFound?.firstname,
+            lastname: userFound?.lastname,
+            email: userFound?.email,
+            profilePhoto: userFound?.profilePhoto,
+            isAdmin: userFound?.isAdmin,
+            token: generateToken(userFound?._id)
+        });
     }else{
         res.status(401);
         throw new Error("Invalid Credentials!!")
