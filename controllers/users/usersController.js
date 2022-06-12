@@ -82,6 +82,21 @@ const fetchUserDetails = expressAsyncHandler(async (req, res) => {
 });
 
 //--------------------------------------------------------------
+//Fetch User Profile
+//--------------------------------------------------------------
+
+const fetchUserProfile = expressAsyncHandler( async (req, res)=>{
+  const { id } = req.params;
+  validateId(id);
+  try {
+    const userProfile = await User.findById(id);
+    res.json(userProfile)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+//--------------------------------------------------------------
 //Delete Users
 //--------------------------------------------------------------
 
@@ -97,4 +112,53 @@ const userDelete = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { userRegister, userLogin, fetchAllUsers, userDelete, fetchUserDetails };
+//--------------------------------------------------------------
+//Delete Users
+//--------------------------------------------------------------
+
+const updateUser = expressAsyncHandler(async (req, res) => {
+  const {_id} = req?.user;
+  validateId(_id);
+  const user = await User.findByIdAndUpdate(_id, {
+    firstname : req?.body?.firstname,
+    lastname : req?.body?.lastname,
+    email : req?.body?.email,
+    bio : req?.body?.bio,
+  },
+  {
+    new : true,
+    runValidators : true
+  })
+  res.json(user)
+})
+
+//--------------------------------------------------------------
+//Update User Password
+//--------------------------------------------------------------
+
+const updateUserPassword = expressAsyncHandler(async (req, res) => {
+
+  const { _id } = req?.user;
+  const { password } = req?.body;
+  validateId(_id)
+  const user = await User.findById(_id);
+
+  if(password){
+    user.password = password;
+    const updatedUser = await user.save();
+    res.json(updatedUser)
+  }
+
+  return;
+})
+
+module.exports = {
+  userRegister,
+  userLogin,
+  fetchAllUsers,
+  userDelete,
+  fetchUserDetails,
+  fetchUserProfile,
+  updateUser,
+  updateUserPassword
+};

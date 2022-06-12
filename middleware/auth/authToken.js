@@ -15,12 +15,12 @@ const authToken = expressAsyncHandler( async (req, res, next) => {
                 //Attach user to request object
                 req.user = user;
                 next();
-            }else{
-                throw new Error("No Token is Attached");
             }
         } catch (error) {
             throw new Error("Not authorized or Expired token, Try to login again");
         }
+    }else{
+        throw new Error("There is not token Attached");
     }
 })
 
