@@ -7,7 +7,9 @@ const {
   fetchUserDetails,
   fetchUserProfile,
   updateUser,
-  updateUserPassword
+  updateUserPassword,
+  followUser,
+  unfollowUser
 } = require("../../controllers/users/usersController");
 const authToken = require("../../middleware/auth/authToken");
 
@@ -21,6 +23,10 @@ usersRoutes.post("/login", userLogin);
 usersRoutes.get("/", authToken, fetchAllUsers);
 //Update User Password
 usersRoutes.put("/password", authToken, updateUserPassword);
+//Follow User
+usersRoutes.put("/follow", authToken, followUser);
+//Unfollow User
+usersRoutes.put("/unfollow", authToken, unfollowUser);
 //Get user Profile
 usersRoutes.get("/profile/:id", authToken, fetchUserProfile);
 //Delete User

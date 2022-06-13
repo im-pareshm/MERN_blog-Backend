@@ -85,16 +85,16 @@ const fetchUserDetails = expressAsyncHandler(async (req, res) => {
 //Fetch User Profile
 //--------------------------------------------------------------
 
-const fetchUserProfile = expressAsyncHandler( async (req, res)=>{
+const fetchUserProfile = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   validateId(id);
   try {
     const userProfile = await User.findById(id);
-    res.json(userProfile)
+    res.json(userProfile);
   } catch (error) {
-    res.json(error)
+    res.json(error);
   }
-})
+});
 
 //--------------------------------------------------------------
 //Delete Users
@@ -117,40 +117,109 @@ const userDelete = expressAsyncHandler(async (req, res) => {
 //--------------------------------------------------------------
 
 const updateUser = expressAsyncHandler(async (req, res) => {
-  const {_id} = req?.user;
+  const { _id } = req?.user;
   validateId(_id);
-  const user = await User.findByIdAndUpdate(_id, {
-    firstname : req?.body?.firstname,
-    lastname : req?.body?.lastname,
-    email : req?.body?.email,
-    bio : req?.body?.bio,
-  },
-  {
-    new : true,
-    runValidators : true
-  })
-  res.json(user)
-})
+  const user = await User.findByIdAndUpdate(
+    _id,
+    {
+      firstname: req?.body?.firstname,
+      lastname: req?.body?.lastname,
+      email: req?.body?.email,
+      bio: req?.body?.bio,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.json(user);
+});
 
 //--------------------------------------------------------------
 //Update User Password
 //--------------------------------------------------------------
 
 const updateUserPassword = expressAsyncHandler(async (req, res) => {
-
   const { _id } = req?.user;
   const { password } = req?.body;
-  validateId(_id)
+  validateId(_id);
   const user = await User.findById(_id);
 
-  if(password){
+  if (password) {
     user.password = password;
     const updatedUser = await user.save();
-    res.json(updatedUser)
+    res.json(updatedUser);
   }
 
   return;
-})
+});
+
+//--------------------------------------------------------------
+//Follow User
+//--------------------------------------------------------------
+
+const followUser = expressAsyncHandler(async (req, res) => {
+  const { followId } = req.body;
+  const loginUserId = req.user.id;
+
+  //Check for duplicate follows
+  const targetUser = await User.findById(followId);
+
+  const isFollowing = targetUser?.followers?.find(
+    (user) => user?.toString() === loginUserId.toString()
+  );
+
+  if (isFollowing) throw new Error("You are already following this user");
+
+  //Find the followed user and update followers list
+  await User.findByIdAndUpdate(
+    followId,
+    {
+      $push: { followers: loginUserId },
+      isFollowing: true,
+    },
+    { new: true }
+  );
+
+  //Update following list of login user
+  await User.findByIdAndUpdate(
+    loginUserId,
+    {
+      $push: { following: followId },
+    },
+    { new: true }
+  );
+
+  res.json("You have successfully followed the user");
+});
+
+//--------------------------------------------------------------
+//Unfollow User
+//--------------------------------------------------------------
+
+const unfollowUser = expressAsyncHandler(async (req, res) => {
+  const { unFollowId } = req.body;
+  const loginUserId = req.user.id;
+
+  await User.findByIdAndUpdate(
+    unFollowId,
+    {
+      $pull: { followers: loginUserId },
+      isFollowing: false,
+    },
+    { new: true }
+  );
+
+  await User.findByIdAndUpdate(
+    loginUserId,
+    {
+      $pull: { following: unFollowId },
+    },
+    { new: true }
+  );
+
+  res.json("you have successfull unfollowed this user")
+});
 
 module.exports = {
   userRegister,
@@ -160,5 +229,7 @@ module.exports = {
   fetchUserDetails,
   fetchUserProfile,
   updateUser,
-  updateUserPassword
+  updateUserPassword,
+  followUser,
+  unfollowUser,
 };
