@@ -218,7 +218,41 @@ const unfollowUser = expressAsyncHandler(async (req, res) => {
     { new: true }
   );
 
-  res.json("you have successfull unfollowed this user")
+  res.json("you have successfull unfollowed this user");
+});
+
+//--------------------------------------------------------------
+//Unfollow User
+//--------------------------------------------------------------
+
+const blockUser = expressAsyncHandler(async (req, res) => {
+  const id = req.params.id;
+  validateId(id);
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: true,
+    },
+    { new: true }
+  );
+  res.json(user)
+});
+
+//--------------------------------------------------------------
+//Unfollow User
+//--------------------------------------------------------------
+
+const unBlockUser = expressAsyncHandler(async (req, res) => {
+  const id = req.params.id;
+  validateId(id);
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: false,
+    },
+    { new: true }
+  );
+  res.json(user)
 });
 
 module.exports = {
@@ -232,4 +266,6 @@ module.exports = {
   updateUserPassword,
   followUser,
   unfollowUser,
+  blockUser,
+  unBlockUser
 };
